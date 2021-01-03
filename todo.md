@@ -9,12 +9,16 @@
 -Light theme/dark theme (meme, but also intructive)
 -Experiment with websockets over backend with polling
 -Create a hover animation, a grayed out piece of the current color floats above the column
+-(3) Set up web server enabling players across a network to play one another
+-Make the game have two version: Blitz and Regular
 
 -ability to play one another locally on a machine, across a network, and against the computer (different difficulties)
-    -game must support these different modes
-    -there should be a menu
-    -for playing across a network, allow one player to create the game and share a rooom code inviting another
-    -the Remote and AI matches should be modeled similarly bc each waits for a "other" player to initiate the next move
+    -(1) game must support these different modes
+    -(2) there should be a menu
+    -for playing across a network, allow one player to create the game and share a room code inviting another
+    -allow players to replay the same game type. In the case of remote game, replay the same remote player
 
+-Research if a perfect Connect 4 AI is feasible
+    -how much "research" has been done in terms of playing connect 4, ex. lay people's strategies, complexity
 -write unit tests for the board/game model mechanics 
     -React Enzyme tests too

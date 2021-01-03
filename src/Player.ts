@@ -1,13 +1,13 @@
 import { CellType } from './GridModel';
 
-interface Options {
+export interface PlayerOptions {
   color?: CellType;
 }
 
-export class LocalPlayer {
+export class Player {
   public color: CellType;
 
-  constructor (options: Options) {
+  constructor (options: PlayerOptions) {
     this.color = options?.color || randomColor();
   }
 }

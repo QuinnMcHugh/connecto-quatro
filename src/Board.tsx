@@ -3,37 +3,71 @@ import { observer } from 'mobx-react-lite';
 import { CellType } from './GridModel';
 import { GameModel } from './GameModel';
 
-const Cell = (props: { cell: CellType }) => {
-  const colorClass = props.cell === CellType.Empty
-    ? 'blank'
-    : props.cell === CellType.Red
-      ? 'red-disc'
-      : 'yellow-disc'; // ToDo: how to define these class references in TS?
-  return <div className={`cell ${colorClass}`}></div>;
+interface ICellProps {
+  column: number;
+  row: number;
+
+  // ToDo: group common CellProps into one object to be passed through component hierarchy
+  onClick: (column: number) => void;
+  onHover: (column: number) => void;
+  styleCell: (column: number, row: number) => string;
+}
+
+const Cell = (props: ICellProps) => {
+  return (
+    <div
+      className={props.styleCell(props.column, props.row)}
+      onMouseOver={() => props.onHover(props.column)}
+      onClick={() => props.onClick(props.column)}
+    ></div>
+  );
 }
 
 interface IRowProps {
   cells: Array<CellType>;
+  index: number;
+  onCellHover: (column: number) => void;
+  onCellClick: (column: number) => void;
+  styleCell: (column: number, row: number) => string;
 }
 
 const Row = observer((props: IRowProps) => {
   return (
     <div>
-      {props.cells.map((cell: CellType) => <Cell key={Math.random()} cell={cell} />)}
+      {props.cells.map((cell, index) => (
+        <Cell
+          key={Math.random()}
+          column={index}
+          row={props.index}
+          onHover={props.onCellHover}
+          onClick={props.onCellClick}
+          styleCell={props.styleCell}
+        />)
+      )}
     </div>
   );
 })
 
 interface IBoardProps {
   game: GameModel;
+  onCellHover: (column: number) => void;
+  onCellClick: (column: number) => void;
+  styleCell: (column: number, row: number) => string;
 }
 
-const Board = observer((props: IBoardProps) => {
+export const Board = observer((props: IBoardProps) => {
   return (
     <div className="board">
-      {props.game.rows.map((row: Array<CellType>) => <Row key={Math.random()} cells={row} />)}
+      {props.game.rows.map((row, rowIndex) => (
+        <Row
+          key={Math.random()}
+          cells={row}
+          index={rowIndex}
+          onCellHover={props.onCellHover}
+          onCellClick={props.onCellClick}
+          styleCell={props.styleCell}
+        />)
+      )}
     </div>
   );
 });
-
-export { Board };

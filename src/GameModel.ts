@@ -1,6 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 import { GridModel, CellType, NUM_COLS, NUM_ROWS, FOUR, Coordinate } from './GridModel';
-import { LocalPlayer } from './LocalPlayer';
+import { Player } from './Player';
+import { Opponent, Move } from './Opponent';
+import { DumbAI } from './DumbAI';
 
 export enum Turn {
   Yellow = 'Yellow',
@@ -29,6 +31,14 @@ export function convertTurnToCellType(turn: Turn) {
           : CellType.Empty;
 }
 
+export function oppositeCellType(input: CellType) {
+  return input === CellType.Empty
+    ? CellType.Empty
+    : input === CellType.Red
+      ? CellType.Yellow
+      : CellType.Red;
+}
+
 export function convertCellTypeToTurn(cellType: CellType) {
   return cellType === CellType.Red
       ? Turn.Red
@@ -46,21 +56,43 @@ export class GameModel {
   private _grid: GridModel;
   private _turn: Turn;
   private _matchType: MatchType;
-  private _playerProfile: LocalPlayer;
+  
+  /* Used for AI or Remote games */
+  private _playerProfile: Player;
+  private _opponent: Opponent;
 
-  public constructor(options: GameModelOptions) {
+  constructor(options: GameModelOptions) {
     this._grid = new GridModel();
-    this._turn = options.startTurn ?? this._pickStartColor();
+    this._turn = options.startTurn ?? this._pickRandomColor();
     this._matchType = options.matchType ?? MatchType.Local1v1;
 
     if (this._matchType !== MatchType.Local1v1) {
-      this._playerProfile = new LocalPlayer({});
+      // Randomly assign colors
+      const colorP1 = convertTurnToCellType(this._pickRandomColor());
+      const colorP2 = oppositeCellType(colorP1);
+
+      this._playerProfile = new Player({
+        color: colorP1,
+      });
+      if (this._matchType === MatchType.AI) {
+        this._opponent = new DumbAI({
+          player: new Player({ color: colorP2 }),
+          game: this,
+        });
+
+        // AI goes first
+        if (convertTurnToCellType(this._turn) === colorP2) {
+          this._getOpponentMove();
+        }
+      } else if (this._matchType === MatchType.Remote1v1) {
+        // ToDo: create a remote connection object
+      }
     }
 
     makeAutoObservable(this);
   }
 
-  private _pickStartColor(): Turn {
+  private _pickRandomColor(): Turn {
     return Math.random() < 0.5
       ? Turn.Red
       : Turn.Yellow;
@@ -78,7 +110,7 @@ export class GameModel {
     return this._matchType;
   }
 
-  get playerProfile(): LocalPlayer {
+  get playerProfile(): Player {
     return this._playerProfile;
   }
 
@@ -113,7 +145,7 @@ export class GameModel {
     this._grid.placeDisc(column, color);
 
     // Compute next turn
-    let [isGameOver] = this._isOver(); // todo: bug
+    let [isGameOver] = this._isOver();
     if (isGameOver) {
       this._turn = Turn.GameOver;
     } else {
@@ -121,6 +153,25 @@ export class GameModel {
         ? Turn.Yellow
         : Turn.Red;
     }
+
+    const isOpponentsTurn = this.matchType !== MatchType.Local1v1
+      && this._turn !== convertCellTypeToTurn(this._playerProfile.color)
+      && this._turn !== Turn.GameOver;
+    if (isOpponentsTurn) {
+      this._getOpponentMove();
+    }
+  }
+
+  private _getOpponentMove() {
+    this._opponent.getMove().then((move: Move) => {
+      if (this.canPlayDisc(move.column, move.color)) {
+        this.playDisc(move.column, move.color);
+      } else {
+        throw Error(`Can't place opponent move: ${move.color} in column ${move.column}`);
+      }
+    }).catch(err => {
+      console.log(err);
+    });
   }
 
   public getFinalResult(): Result {
