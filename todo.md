@@ -13,8 +13,6 @@
 -Make the game have two version: Blitz and Regular
 
 -ability to play one another locally on a machine, across a network, and against the computer (different difficulties)
-    -(1) game must support these different modes
-    -(2) there should be a menu
     -for playing across a network, allow one player to create the game and share a room code inviting another
     -allow players to replay the same game type. In the case of remote game, replay the same remote player
 

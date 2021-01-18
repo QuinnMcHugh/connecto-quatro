@@ -3,6 +3,7 @@ import { GridModel, CellType, NUM_COLS, NUM_ROWS, FOUR, Coordinate } from './Gri
 import { Player } from './Player';
 import { Opponent, Move } from './Opponent';
 import { DumbAI } from './DumbAI';
+import { RemoteOpponent } from './RemoteOpponent';
 
 export enum Turn {
   Yellow = 'Yellow',
@@ -60,6 +61,7 @@ export class GameModel {
   /* Used for AI or Remote games */
   private _playerProfile: Player;
   private _opponent: Opponent;
+  private _joinLink: string;
 
   constructor(options: GameModelOptions) {
     this._grid = new GridModel();
@@ -82,10 +84,14 @@ export class GameModel {
 
         // AI goes first
         if (convertTurnToCellType(this._turn) === colorP2) {
-          this._getOpponentMove();
+          this._opponent.notifyMove(null);
         }
       } else if (this._matchType === MatchType.Remote1v1) {
-        // ToDo: create a remote connection object
+        this._opponent = new RemoteOpponent({
+          player: new Player({ color: colorP2 }),
+          game: this,
+        });
+        // determine on game start which player goes first
       }
     }
 
@@ -114,11 +120,15 @@ export class GameModel {
     return this._playerProfile;
   }
 
+  get joinGameLink(): string {
+    return this._joinLink;
+  }
+
   private _noOpenSpots(): boolean {
     return !this._grid.rows[0].some((cell: CellType) => cell === CellType.Empty);
   }
 
-  private _isOver(): [boolean, Result] {
+  public isOver(): [boolean, Result] {
     const winner = this._getWinner();
     const isTie = winner === CellType.Empty && this._noOpenSpots();
     const gameOver = winner !== CellType.Empty || isTie;
@@ -143,9 +153,17 @@ export class GameModel {
 
   public playDisc(column: number, color: CellType) {
     this._grid.placeDisc(column, color);
+    if (color === this._playerProfile.color && // todo: this has broken for two-player local mode
+        this.matchType !== MatchType.Local1v1
+    ) {
+      this._opponent.notifyMove({
+        column,
+        color,
+      });
+    }
 
     // Compute next turn
-    let [isGameOver] = this._isOver();
+    let [isGameOver] = this.isOver();
     if (isGameOver) {
       this._turn = Turn.GameOver;
     } else {
@@ -154,28 +172,33 @@ export class GameModel {
         : Turn.Red;
     }
 
-    const isOpponentsTurn = this.matchType !== MatchType.Local1v1
-      && this._turn !== convertCellTypeToTurn(this._playerProfile.color)
-      && this._turn !== Turn.GameOver;
-    if (isOpponentsTurn) {
-      this._getOpponentMove();
+    // const isOpponentsTurn = this.matchType !== MatchType.Local1v1
+    //   && this._turn !== convertCellTypeToTurn(this._playerProfile.color)
+    //   && this._turn !== Turn.GameOver;
+    // if (isOpponentsTurn) {
+    //   this._getOpponentMove();
+    // }
+  }
+
+  public receiveOpponentMove(move: Move): void {
+    if (this.canPlayDisc(move.column, move.color)) {
+      this.playDisc(move.column, move.color);
+    } else {
+      throw Error(`Can't place opponent move: ${move.color} in column ${move.column}`);
     }
   }
 
-  private _getOpponentMove() {
-    this._opponent.getMove().then((move: Move) => {
-      if (this.canPlayDisc(move.column, move.color)) {
-        this.playDisc(move.column, move.color);
-      } else {
-        throw Error(`Can't place opponent move: ${move.color} in column ${move.column}`);
-      }
-    }).catch(err => {
-      console.log(err);
-    });
+  public receiveStartParams(color: CellType, turn: Turn): void {
+    this._playerProfile.color = color;
+    this._turn = turn;
+  }
+
+  public setGameJoinLink(link: string) {
+    this._joinLink = link;
   }
 
   public getFinalResult(): Result {
-    return this._isOver()[1];
+    return this.isOver()[1];
   }
 
   private _getWinner(): CellType {

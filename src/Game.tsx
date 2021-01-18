@@ -7,6 +7,13 @@ import { DiscDropper } from './DiscDropper';
 import { CellType } from './GridModel';
 import { GameMenu } from './GameMenu';
 import { InGameMenu } from './InGameMenu';
+import { InviteModal } from './InviteModal';
+
+const roomId = window.location.pathname.substr(1);
+const hasJoinedGame = roomId && roomId.length === 8;
+const initialGameState = hasJoinedGame
+  ? new GameModel({ matchType: MatchType.Remote1v1 })
+  : null;
 
 interface ITurnDisplayProps {
   turn: Turn;
@@ -26,10 +33,11 @@ const isColumnPlayable = (column: number, game: GameModel) => {
 };
 
 export const Game = observer(() => {
-  const [ showMenu, setShowMenu ] = React.useState(true);
-  const [ showGame, setShowGame ] = React.useState(false);
-  const [ game, setGame ] = React.useState<GameModel>();
+  const [ showMenu, setShowMenu ] = React.useState(!hasJoinedGame);
+  const [ showGame, setShowGame ] = React.useState(hasJoinedGame);
+  const [ game, setGame ] = React.useState<GameModel>(initialGameState);
   const [ hoveredColumn, setHoveredColumn ] = React.useState<number>(-1);
+  const [ inviteModalClosed, setInviteModalClosed ] = React.useState<boolean>(false);
 
   const playDisc = (column: number, color: CellType) => {
     game.playDisc(column, color);
@@ -82,7 +90,9 @@ export const Game = observer(() => {
         matchType: MatchType.Local1v1,
       }));
     } else if (selectedGameType === MatchType.Remote1v1) {
-      // ToDo, implement networked gameplay
+      setGame(new GameModel({
+        matchType: MatchType.Remote1v1,
+      }));
     } else if (selectedGameType === MatchType.AI) {
       setGame(new GameModel({
         matchType: MatchType.AI,
@@ -99,6 +109,9 @@ export const Game = observer(() => {
     setShowGame(false);
     setShowMenu(true);
   };
+  const closeModal = () => {
+    setInviteModalClosed(true);
+  }
 
   return (
     <>
@@ -120,6 +133,11 @@ export const Game = observer(() => {
             onInitiateRematch={handleInitiateRematch}
             onNavigateMainMenu={handleNavigateMainMenu}
             gameState={game.turn}
+          />
+          <InviteModal
+            isOpen={game.joinGameLink && !inviteModalClosed}
+            onRequestClose={closeModal}
+            joinGameLink={game.joinGameLink}
           />
         </>
       }
