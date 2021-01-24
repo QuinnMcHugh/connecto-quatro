@@ -14,7 +14,7 @@ export const InGameMenu = (props: IInGameMenu) => {
     props.onNavigateMainMenu();
   };
 
-  const rematch = <a href="#rematch" onClick={handleRematchClick}>Rematch &#8635;</a>; // disable until game end
+  const rematch = <a href="#rematch" onClick={handleRematchClick}>Rematch &#8635;</a>;
   const mainMenu = <a href="#menu" onClick={handleMainMenuClick}>Main Menu &#8594;</a>;
   return (
     <div>

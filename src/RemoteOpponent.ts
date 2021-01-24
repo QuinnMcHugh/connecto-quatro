@@ -3,6 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { CellType } from './GridModel';
 import { Player } from './Player';
 import { GameModel, Turn, oppositeCellType } from './GameModel';
+import { makeObservable, observable } from 'mobx';
 
 const ENDPOINT = "http://localhost:3000";
 
@@ -16,17 +17,26 @@ const convertObjectToQueryString = (obj: { [key: string]: any }): string => {
 };
 
 const createGameLink = (roomId: string): string => {
-  return `${window.location.href}${roomId}`;
+  return `${window.location.origin}/${roomId}`;
 }
 
 export class RemoteOpponent implements Opponent {
   private _socket: Socket;
   private _self: Player;
   private _game: GameModel;
+  private _roomFull: boolean;
+  private _connectionEnded: boolean;
 
   constructor (options: OpponentOptions) {
+    makeObservable<RemoteOpponent | "_roomFull" | "_connectionEnded">(this, {
+      _roomFull: observable,
+      _connectionEnded: observable,
+    });
+
     this._self = options.player;
     this._game = options.game;
+    this._roomFull = false;
+    this._connectionEnded = false;
 
     // Determine handshake query based on the state of the game being joined/created
     const roomId = window.location.pathname.substr(1);
@@ -52,13 +62,14 @@ export class RemoteOpponent implements Opponent {
       this._game.setGameJoinLink(createGameLink(roomId));
     });
     this._socket.on('second player joined', () => {
+      this._roomFull = true;
       console.log(`let's get ready to rumble!`);
-      // todo: disable game play until each player is present
     });
 
     this._socket.on('gameSetup', (color: CellType, turn: Turn) => {
       console.log(`gameSetup: start turn: ${turn} my color: ${color}`);
       this._game.receiveStartParams(color, turn);
+      this._roomFull = true;
     });
 
     this._socket.on('disc played', (color: CellType, column: number) => {
@@ -68,24 +79,36 @@ export class RemoteOpponent implements Opponent {
         color,
       });
     });
+
+    this._socket.on('disconnect', () => {
+      this._disconnectGame();
+    });
+    this._socket.on('room ended', () => {
+      this._disconnectGame();
+    });
+  }
+
+  private _disconnectGame() {
+    this._roomFull = false;
+    this._connectionEnded = true;
+    this._socket.disconnect();
   }
 
   private _makeMove(move: Move) {
     this._game.receiveOpponentMove(move);
   }
 
-//   public getMove(): Promise<Move> {
-//     let move: Move;
-//     this._socket.on('play disc', () => {
-//       move.color = this._self.color;
-//       move.column = 0;
-//     });
-//     this._socket.once
-//   }
-
   public notifyMove(move: Move): void {
     // send message to server
     this._socket.emit('play disc', move.color, move.column);
     console.log(`player placing disc of ${move.color} in column ${move.column}`);
+  }
+
+  get hasJoined(): boolean {
+    return this._roomFull || this._connectionEnded;
+  }
+
+  get hasDisconnected(): boolean {
+    return this._connectionEnded;
   }
 }

@@ -82,7 +82,6 @@ export const Game = observer(() => {
     return `cell ${colorClass} ${backgroundClass}`;
   };
   const handleMenuSelection = (selectedGameType: string) => {
-    // spawn new game of selecteGameType, hide menu
     setShowMenu(false);
 
     if (selectedGameType === MatchType.Local1v1) {
@@ -90,7 +89,7 @@ export const Game = observer(() => {
         matchType: MatchType.Local1v1,
       }));
     } else if (selectedGameType === MatchType.Remote1v1) {
-      setGame(new GameModel({
+      setGame(new GameModel({ // todo: does not work when creating a second game in a session
         matchType: MatchType.Remote1v1,
       }));
     } else if (selectedGameType === MatchType.AI) {
@@ -102,7 +101,7 @@ export const Game = observer(() => {
   };
   const handleInitiateRematch = () => {
     setGame(new GameModel({
-      matchType: game.matchType,
+      matchType: game.matchType, // todo: coordinate rematches of remote games with server
     }));
   };
   const handleNavigateMainMenu = () => {

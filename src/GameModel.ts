@@ -91,7 +91,6 @@ export class GameModel {
           player: new Player({ color: colorP2 }),
           game: this,
         });
-        // determine on game start which player goes first
       }
     }
 
@@ -124,6 +123,14 @@ export class GameModel {
     return this._joinLink;
   }
 
+  get hasOpponentJoined(): boolean {
+    return this?._opponent?.hasJoined;
+  }
+
+  get hasOpponentLeft(): boolean {
+    return this?._opponent?.hasDisconnected;
+  }
+
   private _noOpenSpots(): boolean {
     return !this._grid.rows[0].some((cell: CellType) => cell === CellType.Empty);
   }
@@ -153,8 +160,9 @@ export class GameModel {
 
   public playDisc(column: number, color: CellType) {
     this._grid.placeDisc(column, color);
-    if (color === this._playerProfile.color && // todo: this has broken for two-player local mode
-        this.matchType !== MatchType.Local1v1
+
+    if (this._matchType !== MatchType.Local1v1 &&
+      color === this._playerProfile.color
     ) {
       this._opponent.notifyMove({
         column,
@@ -171,13 +179,6 @@ export class GameModel {
         ? Turn.Yellow
         : Turn.Red;
     }
-
-    // const isOpponentsTurn = this.matchType !== MatchType.Local1v1
-    //   && this._turn !== convertCellTypeToTurn(this._playerProfile.color)
-    //   && this._turn !== Turn.GameOver;
-    // if (isOpponentsTurn) {
-    //   this._getOpponentMove();
-    // }
   }
 
   public receiveOpponentMove(move: Move): void {
@@ -255,7 +256,7 @@ export class GameModel {
     // Check possible diagonals, both ways
     // 1. left-to-right and top-to-bottom diagonals, beginning with lines that touch the bottom
     for (let col = FOUR - 1; col < NUM_COLS; col++) {
-      for (let offset = 0; offset <= (col + 1 - FOUR) - (col >= NUM_ROWS ? col - NUM_ROWS + 1 : 0); offset++) { // todo: this math may have to be reconsidered when variable dimensions are introduced
+      for (let offset = 0; offset <= (col + 1 - FOUR) - (col >= NUM_ROWS ? col - NUM_ROWS + 1 : 0); offset++) { // todo: this math may have to be reconsidered if/when variable dimensions are introduced
         const startRow = (NUM_ROWS - 1) - offset,
           startCol = col - offset;
         const first = rows[startRow][startCol],

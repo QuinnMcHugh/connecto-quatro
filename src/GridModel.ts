@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 export const NUM_ROWS = 6, NUM_COLS = 7;
-export const FOUR = 4; // todo: this is the number in a row which forms a win, can be dynamic
+export const FOUR = 4; // the number in a row for a win, in future may be dynamic
 
 export enum CellType {
   Yellow = 'Yellow',

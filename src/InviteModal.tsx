@@ -29,7 +29,7 @@ export const InviteModal = (props: IInviteModalProps) => {
     >
       <>
         <h1>Invite a friend</h1>
-        <p>Copy link: <a target="_blank" href={props.joinGameLink}>{props.joinGameLink}</a></p>
+        <p>Copy link: <a target="_blank" rel="noreferrer" href={props.joinGameLink}>{props.joinGameLink}</a></p>
         <button onClick={props.onRequestClose}>Close</button>
       </>
     </Modal>

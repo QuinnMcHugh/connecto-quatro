@@ -1,13 +1,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { CellType } from './GridModel';
-import { GameModel } from './GameModel';
+import { GameModel, MatchType } from './GameModel';
 
 interface ICellProps {
   column: number;
   row: number;
 
-  // ToDo: group common CellProps into one object to be passed through component hierarchy
   onClick: (column: number) => void;
   onHover: (column: number) => void;
   styleCell: (column: number, row: number) => string;
@@ -48,6 +47,16 @@ const Row = observer((props: IRowProps) => {
   );
 })
 
+const getBoardOverlay = (waitingOnOpponent: boolean, gameDisconnected: boolean): string => {
+  if (waitingOnOpponent) {
+    return 'Waiting on opponent to join...'; // todo: make this a react component, where every second another dot gets added for 'live' feel
+  } else if (gameDisconnected) {
+    return 'Opponent has disconnected';
+  } else {
+    return '';
+  }
+};
+
 interface IBoardProps {
   game: GameModel;
   onCellHover: (column: number) => void;
@@ -56,18 +65,41 @@ interface IBoardProps {
 }
 
 export const Board = observer((props: IBoardProps) => {
+  const inRemoteGame = props.game.matchType === MatchType.Remote1v1;
+  const waitingOnOpponent = inRemoteGame && !props.game.hasOpponentJoined;
+  const gameDisconnected = inRemoteGame && props.game.hasOpponentLeft;
+  const gameDisabled = waitingOnOpponent || gameDisconnected;
+  const overlayMessage = getBoardOverlay(waitingOnOpponent, gameDisconnected);
+
+  const handleCellHover = gameDisabled
+    ? (column: number) => {}
+    : props.onCellHover;
+  const handleCellClick = gameDisabled
+    ? (column: number) => {}
+    : props.onCellClick;
+  const disabledClass = gameDisabled
+    ? 'board-disabled'
+    : '';
+    
   return (
-    <div className="board">
-      {props.game.rows.map((row, rowIndex) => (
-        <Row
-          key={Math.random()}
-          cells={row}
-          index={rowIndex}
-          onCellHover={props.onCellHover}
-          onCellClick={props.onCellClick}
-          styleCell={props.styleCell}
-        />)
-      )}
-    </div>
+    <>
+      <div className={`board ${disabledClass}`}>
+        {props.game.rows.map((row, rowIndex) => (
+          <Row
+            key={Math.random()}
+            cells={row}
+            index={rowIndex}
+            onCellHover={handleCellHover}
+            onCellClick={handleCellClick}
+            styleCell={props.styleCell}
+          />)
+        )}
+      </div>
+      {overlayMessage && 
+        <div className="board-overlay">
+          <h2>{overlayMessage}</h2>
+        </div>
+      }
+    </>
   );
 });

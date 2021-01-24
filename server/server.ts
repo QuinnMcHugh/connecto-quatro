@@ -51,10 +51,10 @@ http.listen(PORT, function () {
 });
 
 // Returns reasonably unique 8 digit id
-var generateRoomId = function () {
+const generateRoomId = () => {
     return Array.from({ length: 8 })
-        .map(function (_) { return Math.floor(Math.random() * 16).toString(16); })
-        .join('');
+      .map(function (_) { return Math.floor(Math.random() * 16).toString(16); })
+      .join('');
 };
 
 interface GameSocket {
@@ -70,20 +70,20 @@ interface Game {
 // todo: to scale, clean up games after they finish or have been live for 15min
 const roomGameMapping = new Map<string, Game>();
 
-var getRoomContaining = (socketId: string, roomGameMap: Map<string, Game>): string => {
-    let roomId = null;
-    roomGameMap.forEach((value: Game, key: string) => {
-      if (value.sockets.some(socket => socket.id === socketId)) {
-        roomId = key;
-      }
-    });
-    return roomId;
+const getRoomContaining = (socketId: string, roomGameMap: Map<string, Game>): string => {
+  let roomId = null;
+  roomGameMap.forEach((value: Game, key: string) => {
+    if (value.sockets.some(socket => socket.id === socketId)) {
+      roomId = key;
+    }
+  });
+  return roomId;
 };
 
-// todo: facilitate game rematches
+// todo: (2) facilitate game rematches
 io.on('connection', (socket: Socket) => {
-    var query = socket.handshake.query;
-    var roomId = query['roomId'];
+    const query = socket.handshake.query;
+    const roomId = query['roomId'];
     console.log("received a connection: " + roomId + " from " + socket.id);
 
     // Create new room or use existing
@@ -108,9 +108,9 @@ io.on('connection', (socket: Socket) => {
         console.log(`roomId ${JSON.stringify(roomGameMapping, replacer)} from ${socket.id}`);
     }
     else {
-        var color = query['color'] as CellType;
-        var turn = query['turn'] as Turn;
-        var newRoomId = generateRoomId();
+        const color = query['color'] as CellType;
+        const turn = query['turn'] as Turn;
+        const newRoomId = generateRoomId();
 
         socket.join(newRoomId);
         roomGameMapping.set(newRoomId, {
@@ -134,11 +134,11 @@ io.on('connection', (socket: Socket) => {
         socket.to(room).emit('disc played', color, column);
     });
 
-    socket.on('disconnect', function (reason) {
-        // show message that other player left
+    socket.on('disconnect', (reason) => {
+      const roomId = getRoomContaining(socket.id, roomGameMapping);
+      if (roomId) {
+        io.to(roomId).emit('room ended');
+        roomGameMapping.delete(roomId);
+      }
     });
 });
-
-// user shares link with 'room'
-// the first two sockets entering that 'room' will become players in the game
-// in uri, support noticing room id and automatically syncing to specified game

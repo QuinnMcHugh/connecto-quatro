@@ -34,4 +34,12 @@ export class DumbAI implements Opponent {
       }, 2000);
     }
   }
+
+  get hasJoined(): boolean {
+    return true;
+  }
+
+  get hasDisconnected(): boolean {
+    return false;
+  }
 }

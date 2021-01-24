@@ -13,7 +13,9 @@ export interface OpponentOptions {
 }
 
 // two types of opponents: AI and Remote
-// each has one basic piece of functionality: playing the next piece
+// each has one basic piece of functionality: playing the next piece when notified
 export interface Opponent {
   notifyMove: (move: Move) => void;
+  readonly hasJoined: boolean;
+  readonly hasDisconnected: boolean;
 }

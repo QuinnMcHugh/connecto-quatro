@@ -42,3 +42,20 @@
 .game-menu input {
   margin: 0.4em;
 }
+
+.board-disabled {
+  opacity: 0.4;
+}
+
+.board-overlay {
+  position: relative;
+  top: -240px;
+  left: 25px;
+  background-color: rgba(129, 207, 146, 0.7);
+  text-align: center;
+  margin: 0em;
+  padding: 0.5em 2em;
+  display: inline-block;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}

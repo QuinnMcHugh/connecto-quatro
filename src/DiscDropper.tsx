@@ -2,10 +2,6 @@ import { NUM_COLS } from './GridModel';
 import { Turn } from './GameModel';
 
 interface IDiscDropperProps {
-// todo: may want to includes these two if clicking on the space above columns should be permitted (nice feature)
-//   handleColumnClick: (column: number) => void;
-//   isColumnDisabled: (column: number) => boolean;
-
   hoveredColumn: number;
   turn: Turn;
 }
