@@ -5,7 +5,7 @@ import { Player } from './Player';
 import { GameModel, Turn, oppositeCellType } from './GameModel';
 import { makeObservable, observable } from 'mobx';
 
-const ENDPOINT = "http://localhost:3000";
+const ENDPOINT = "http://localhost:3000"; // todo: can this be assumed to be the same url+portit was served from
 
 const convertObjectToQueryString = (obj: { [key: string]: any }): string => {
   let str = '';
@@ -54,7 +54,7 @@ export class RemoteOpponent implements Opponent {
     this._socket = io(ENDPOINT, {
       query: convertObjectToQueryString(queryParams),
     });
-    console.log(`query params: ${convertObjectToQueryString(queryParams)}`);
+    console.log(`query params: ${convertObjectToQueryString(queryParams)}`); // todo: clean up these log() statements
     console.log(`sending connection with ${roomId || null} from ${this._socket.id}`);
     
     this._socket.on('room formed', (roomId: string) => {

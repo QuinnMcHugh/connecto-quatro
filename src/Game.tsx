@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { GameModel, Turn, convertTurnToCellType, MatchType } from './GameModel';
+import { GameModel, convertTurnToCellType, MatchType } from './GameModel';
 import { Board } from './Board';
 import { DiscDropper } from './DiscDropper';
 import { CellType } from './GridModel';
@@ -14,19 +14,6 @@ const hasJoinedGame = roomId && roomId.length === 8;
 const initialGameState = hasJoinedGame
   ? new GameModel({ matchType: MatchType.Remote1v1 })
   : null;
-
-interface ITurnDisplayProps {
-  turn: Turn;
-}
-
-const TurnDisplay = (props: ITurnDisplayProps) => {
-  const message = props.turn === Turn.GameOver
-    ? 'Game Over'
-    : props.turn === Turn.Red
-      ? 'Red\'s Turn'
-      : 'Yellow\'s Turn';
-  return <span>{message}</span>;
-};
 
 const isColumnPlayable = (column: number, game: GameModel) => {
   return game.canPlayDisc(column, convertTurnToCellType(game.turn));
@@ -117,22 +104,25 @@ export const Game = observer(() => {
       {showMenu && <GameMenu onSubmitClicked={handleMenuSelection} /> }
       {showGame && 
         <>
-          <DiscDropper
-            hoveredColumn={hoveredColumn}
-            turn={game.turn}
-          />
-          <Board
-            game={game}
-            onCellHover={handleCellHover}
-            onCellClick={handleCellClick}
-            styleCell={styleCell}
-          />
-          <TurnDisplay turn={game.turn} />
-          <InGameMenu
-            onInitiateRematch={handleInitiateRematch}
-            onNavigateMainMenu={handleNavigateMainMenu}
-            gameState={game.turn}
-          />
+          <div className="game-area">
+            <div>
+              <DiscDropper
+                hoveredColumn={hoveredColumn}
+                turn={game.turn}
+              />
+              <Board
+                game={game}
+                onCellHover={handleCellHover}
+                onCellClick={handleCellClick}
+                styleCell={styleCell}
+              />
+            </div>
+            <InGameMenu
+              onInitiateRematch={handleInitiateRematch}
+              onNavigateMainMenu={handleNavigateMainMenu}
+              game={game}
+            />
+          </div>
           <InviteModal
             isOpen={game.joinGameLink && !inviteModalClosed}
             onRequestClose={closeModal}

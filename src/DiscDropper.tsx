@@ -12,7 +12,7 @@ export const DiscDropper = (props: IDiscDropperProps) => {
     columns[props.hoveredColumn] = true;
   }
 
-  const hoverCells = columns.map(hovered => {
+  const hoverCells = columns.map((hovered, index) => {
     const colorClass = props.turn === Turn.GameOver
       ? 'blank'
       : props.turn === Turn.Red
@@ -21,12 +21,12 @@ export const DiscDropper = (props: IDiscDropperProps) => {
     const visibilityClass = hovered ? '' : 'invisible';
     const cellClass = `cell ${colorClass} ${visibilityClass}`;
     return (
-      <div key={Math.random()} className={cellClass}></div>
+      <div key={index} className={cellClass}></div>
     );
   });
 
   return (
-    <div className='column-hover'>
+    <div className="row">
       {hoverCells}
     </div>
   );

@@ -16,11 +16,11 @@ export const GameMenu = (props: IGameMenuProps) => {
   };
 
   return (
-    <>
-      <form className='game-menu'>
+    <div className="game-menu">
+      <form>
         <h3>Game type</h3>
         <div>
-          <div>
+          <div className="option">
             <input
               type="radio"
               id="local"
@@ -30,7 +30,7 @@ export const GameMenu = (props: IGameMenuProps) => {
               defaultChecked />
             <label htmlFor="local">1 vs. 1, same computer</label>
           </div>
-          <div>
+          <div className="option">
             <input
               type="radio"
               id="remote"
@@ -39,18 +39,18 @@ export const GameMenu = (props: IGameMenuProps) => {
               onChange={handleRadioButtonChange} />
             <label htmlFor="remote">1 vs. 1, invite with code</label>
           </div>
-          <div>
+          <div className="option">
             <input
               type="radio"
               id="ai"
               name="game-type"
               value={MatchType.AI}
               onChange={handleRadioButtonChange} />
-            <label htmlFor="ai">Play an AI</label>
+            <label htmlFor="ai">Play an AI (dumb)</label>
           </div>
         </div>
         <input type="button" value="Launch game" onClick={handleSubmitClicked} />
       </form>
-    </>
+    </div>
   );
 }

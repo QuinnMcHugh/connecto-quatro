@@ -28,7 +28,7 @@ export const InviteModal = (props: IInviteModalProps) => {
       shouldCloseOnOverlayClick={false}
     >
       <>
-        <h1>Invite a friend</h1>
+        <h2>Invite a friend</h2>
         <p>Copy link: <a target="_blank" rel="noreferrer" href={props.joinGameLink}>{props.joinGameLink}</a></p>
         <button onClick={props.onRequestClose}>Close</button>
       </>

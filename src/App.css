@@ -5,13 +5,9 @@
   height: 50px;
   border-radius: 3em;
   display: inline-block;
-
-  /*unsure if this is needed*/
-  position: relative;
 }
 
 .blank {
-  /* background: transparent; */
   background: white;
 }
 
@@ -31,31 +27,93 @@
 
 .board {
   background-color: rgba(44, 44, 255, 0.86);
-  display: inline-block;
   border-radius: 1em;
+  margin: 0 2em 2em 0;
+  position: relative;
 }
 
 .cell.invisible {
   visibility: hidden;
 }
 
-.game-menu input {
-  margin: 0.4em;
+.game-menu {
+  display: flex;
+  justify-content: center;
 }
 
-.board-disabled {
-  opacity: 0.4;
+.game-menu .option {
+  margin: 0.5em 0;
+}
+
+.game-menu input {
+  margin-right: 0.5em;
+}
+
+.game-menu input[type=button] {
+  margin-top: 1em;
 }
 
 .board-overlay {
-  position: relative;
-  top: -240px;
-  left: 25px;
+  position: absolute;
+  top: 150px;
+  left: 30px;
+  opacity: 1;
+
   background-color: rgba(129, 207, 146, 0.7);
-  text-align: center;
-  margin: 0em;
-  padding: 0.5em 2em;
-  display: inline-block;
+  width: 19.5em;
+  padding: 0.5em 1em 0.5em 2em;
   border-radius: 20px;
   backdrop-filter: blur(10px);
+}
+
+@font-face {
+  font-family: "speedfont";
+  src: url("./fonts/FasterOne-Regular.ttf");
+}
+
+h1 {
+  font-family: 'speedfont', cursive;
+  font-weight: 200;
+  font-size: 3em;
+  text-align: center;
+}
+
+.match-type {
+  margin-top: 0;
+}
+
+.in-game-menu {
+  background-color: rgb(220, 237, 251);
+  border-radius: 1em;
+  padding: 1em 1.25em;
+  width: 135px;
+  margin-top: 62px;
+  margin-bottom: 2em;
+}
+
+@media (max-width: 638px) {
+  .in-game-menu {
+    margin-top: 0;
+  }
+}
+
+.in-game-menu .actions {
+  margin-top: 3em;
+}
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.game-area {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+body {
+  display: flex;
+  justify-content: center;
 }

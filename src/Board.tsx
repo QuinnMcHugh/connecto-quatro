@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 
 import { CellType } from './GridModel';
 import { GameModel, MatchType } from './GameModel';
@@ -32,10 +33,10 @@ interface IRowProps {
 
 const Row = observer((props: IRowProps) => {
   return (
-    <div>
+    <div className="row">
       {props.cells.map((cell, index) => (
         <Cell
-          key={Math.random()}
+          key={index}
           column={index}
           row={props.index}
           onHover={props.onCellHover}
@@ -47,13 +48,30 @@ const Row = observer((props: IRowProps) => {
   );
 })
 
-const getBoardOverlay = (waitingOnOpponent: boolean, gameDisconnected: boolean): string => {
-  if (waitingOnOpponent) {
-    return 'Waiting on opponent to join...'; // todo: make this a react component, where every second another dot gets added for 'live' feel
-  } else if (gameDisconnected) {
-    return 'Opponent has disconnected';
+interface IMessageOverlayProps {
+  waitingOnOpponent: boolean;
+  gameDisconnected: boolean;
+}
+
+const MessageOverlay = (props: IMessageOverlayProps): JSX.Element => {
+  const [dots, setDots] = React.useState<number>(0);
+  
+  React.useEffect(() => {
+    if (props.waitingOnOpponent) {
+      let timer = setTimeout(() => {
+        const nextDots = (dots + 1) % 4;
+        setDots(nextDots);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [props.waitingOnOpponent, dots]);
+
+  if (props.waitingOnOpponent) {
+    return <h3>Waiting on opponent to join {Array(dots).fill('.').join(' ')}</h3>;
+  } else if (props.gameDisconnected) {
+    return <h3>Opponent has disconnected</h3>;
   } else {
-    return '';
+    return null;
   }
 };
 
@@ -65,12 +83,14 @@ interface IBoardProps {
 }
 
 export const Board = observer((props: IBoardProps) => {
-  const inRemoteGame = props.game.matchType === MatchType.Remote1v1;
-  const waitingOnOpponent = inRemoteGame && !props.game.hasOpponentJoined;
-  const gameDisconnected = inRemoteGame && props.game.hasOpponentLeft;
+  const waitingOnOpponent = props.game.matchType === MatchType.Remote1v1 && !props.game.hasOpponentJoined;
+  const gameDisconnected = props.game.matchType === MatchType.Remote1v1 && props.game.hasOpponentLeft;
   const gameDisabled = waitingOnOpponent || gameDisconnected;
-  const overlayMessage = getBoardOverlay(waitingOnOpponent, gameDisconnected);
 
+  const overlayMessage = MessageOverlay({
+    waitingOnOpponent,
+    gameDisconnected,
+  });
   const handleCellHover = gameDisabled
     ? (column: number) => {}
     : props.onCellHover;
@@ -80,13 +100,13 @@ export const Board = observer((props: IBoardProps) => {
   const disabledClass = gameDisabled
     ? 'board-disabled'
     : '';
-    
+
   return (
     <>
       <div className={`board ${disabledClass}`}>
         {props.game.rows.map((row, rowIndex) => (
           <Row
-            key={Math.random()}
+            key={rowIndex}
             cells={row}
             index={rowIndex}
             onCellHover={handleCellHover}
@@ -94,12 +114,12 @@ export const Board = observer((props: IBoardProps) => {
             styleCell={props.styleCell}
           />)
         )}
+        {overlayMessage && 
+          <div className="board-overlay">
+            {overlayMessage}
+          </div>
+        }
       </div>
-      {overlayMessage && 
-        <div className="board-overlay">
-          <h2>{overlayMessage}</h2>
-        </div>
-      }
     </>
   );
 });
