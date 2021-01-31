@@ -1,6 +1,4 @@
 import { Socket } from 'socket.io';
-// todo: make the server/ a separate project with package.json, node_modules/, tsconfig.json, etc. 
-//  -have build/ output files too so .js aren't visible
 
 var app = require('express')();
 var http = require('http').createServer(app);
@@ -14,13 +12,13 @@ enum CellType {
   Empty = 'Empty',
 }
 
-export enum Turn {
+enum Turn {
   Yellow = 'Yellow',
   Red = 'Red',
   GameOver = 'GameOver',
 };
 
-export function oppositeCellType(input: CellType) {
+function oppositeCellType(input: CellType) {
   return input === CellType.Empty
     ? CellType.Empty
     : input === CellType.Red
@@ -34,17 +32,12 @@ function replacer(key, value) {
   if (originalObject instanceof Map) {
     return {
       dataType: 'Map',
-      value: Array.from(originalObject.entries()), // or with spread: value: [...originalObject]
+      value: Array.from(originalObject.entries()),
     };
   } else {
     return value;
   }
 }
-
-// export interface Move {
-//   column: number;
-//   color: CellType;
-// }
 
 http.listen(PORT, function () {
   console.log("listening on *:" + PORT);

@@ -1,0 +1,16 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "server for connect 4 game",
+  "main": "server.js",
+  "scripts": {
+    "start": "tsc && node build/server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/socket.io": "^2.1.12",
+    "express": "^4.17.1",
+    "socket.io": "^3.0.5"
+  }
+}
