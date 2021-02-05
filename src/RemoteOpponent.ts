@@ -54,41 +54,39 @@ export class RemoteOpponent implements Opponent {
     this._socket = io(ENDPOINT, {
       query: convertObjectToQueryString(queryParams),
     });
-    console.log(`query params: ${convertObjectToQueryString(queryParams)}`); // todo: clean up these log() statements
-    console.log(`sending connection with ${roomId || null} from ${this._socket.id}`);
     
     this._socket.on('room formed', (roomId: string) => {
-      console.log(`room fomred with id ${roomId}`);
       this._game.setGameJoinLink(createGameLink(roomId));
     });
     this._socket.on('second player joined', () => {
       this._roomFull = true;
-      console.log(`let's get ready to rumble!`);
     });
 
     this._socket.on('gameSetup', (color: CellType, turn: Turn) => {
-      console.log(`gameSetup: start turn: ${turn} my color: ${color}`);
       this._game.receiveStartParams(color, turn);
       this._roomFull = true;
     });
 
     this._socket.on('disc played', (color: CellType, column: number) => {
-      console.log(`received opponent play at column ${column} of color ${color}`);
       this._makeMove({
         column,
         color,
       });
     });
 
+    this._socket.on('receive rematch', (turn: Turn) => {
+      this._game.receiveRematchParams(turn);
+    });
+
     this._socket.on('disconnect', () => {
-      this._disconnectGame();
+      this.disconnect();
     });
     this._socket.on('room ended', () => {
-      this._disconnectGame();
+      this.disconnect();
     });
   }
 
-  private _disconnectGame() {
+  public disconnect() {
     this._roomFull = false;
     this._connectionEnded = true;
     this._socket.disconnect();
@@ -99,9 +97,11 @@ export class RemoteOpponent implements Opponent {
   }
 
   public notifyMove(move: Move): void {
-    // send message to server
     this._socket.emit('play disc', move.color, move.column);
-    console.log(`player placing disc of ${move.color} in column ${move.column}`);
+  }
+
+  public notifyOfRematch(turn: Turn) {
+    this._socket.emit('request rematch', turn);
   }
 
   get hasJoined(): boolean {

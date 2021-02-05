@@ -1,5 +1,5 @@
 import { CellType } from './GridModel';
-import { GameModel } from './GameModel';
+import { GameModel, Turn } from './GameModel';
 import { Player } from './Player';
 
 export interface Move {
@@ -16,6 +16,8 @@ export interface OpponentOptions {
 // each has one basic piece of functionality: playing the next piece when notified
 export interface Opponent {
   notifyMove: (move: Move) => void;
+  notifyOfRematch?: (turn: Turn) => void;
+  disconnect?: () => void;
   readonly hasJoined: boolean;
   readonly hasDisconnected: boolean;
 }

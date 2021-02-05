@@ -87,9 +87,13 @@ export const Game = observer(() => {
     setShowGame(true);
   };
   const handleInitiateRematch = () => {
-    setGame(new GameModel({
-      matchType: game.matchType, // todo: coordinate rematches of remote games with server
-    }));
+    if (game.matchType === MatchType.Local1v1) {
+      setGame(new GameModel({
+        matchType: game.matchType,
+      }));
+    } else {
+      game.initiateRematch();
+    }
   };
   const handleNavigateMainMenu = () => {
     setShowGame(false);
@@ -97,6 +101,15 @@ export const Game = observer(() => {
   };
   const closeModal = () => {
     setInviteModalClosed(true);
+  }
+
+  const prevShowGameRef = React.useRef<boolean>();
+  React.useEffect(() => {
+    prevShowGameRef.current = showGame;
+  });
+  const prevShowGame = prevShowGameRef.current;
+  if (prevShowGame && showMenu) {
+    game.abandonGame();
   }
 
   return (

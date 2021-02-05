@@ -131,6 +131,10 @@ export class GameModel {
     return this?._opponent?.hasDisconnected;
   }
 
+  public abandonGame(): void {
+    this._opponent?.disconnect?.();
+  }
+
   private _noOpenSpots(): boolean {
     return !this._grid.rows[0].some((cell: CellType) => cell === CellType.Empty);
   }
@@ -210,6 +214,33 @@ export class GameModel {
     } else {
       return CellType.Empty;
     }
+  }
+
+  public initiateRematch() {
+    this._grid = new GridModel();
+    this._turn = this._pickRandomColor();
+
+    if (this.matchType === MatchType.Remote1v1) {
+      this._grid = new GridModel();
+      this._turn = this._pickRandomColor();
+      this._opponent.notifyOfRematch(this._turn);
+    } else if (this.matchType === MatchType.AI) {
+      const opponentColor = oppositeCellType(this._playerProfile.color);
+      this._opponent = new DumbAI({
+        player: new Player({ color: opponentColor }),
+        game: this,
+      });
+
+      // AI goes first
+      if (convertTurnToCellType(this._turn) === opponentColor) {
+        this._opponent.notifyMove(null);
+      }
+    }
+  }
+
+  public receiveRematchParams(turn: Turn) {
+    this._grid = new GridModel();
+    this._turn = turn;
   }
 
   public getWinningPieces(): Array<Coordinate> {

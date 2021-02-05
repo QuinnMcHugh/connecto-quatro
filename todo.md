@@ -14,10 +14,7 @@
 -✓ Create a hover animation, a grayed out piece of the current color floats above the column
 -Make the game have two version: Blitz and Regular
     -Future
--(1) Separate the repo into TypeScript subprojects - one for the front-end and one for the server
 -write a good README
-
--make navigating out of the game disconnect remote sockets (ex. going back to main menu)
 
 -ability to play one another locally on a machine, across a network, and against the computer (different difficulties)
     -for playing across a network, allow one player to create the game and share a room code inviting another
