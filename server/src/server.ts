@@ -1,9 +1,11 @@
 import { Socket } from 'socket.io';
 
-var app = require('express')();
-var http = require('http').createServer(app);
-var PORT = 8080;
-var io = require('socket.io')(http);
+const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
+const path = require("path");
+const PORT = 5000;
+const io = require('socket.io')(http);
 
 enum CellType {
   Yellow = 'Yellow',
@@ -28,6 +30,11 @@ function oppositeCellType(input: CellType) {
 http.listen(PORT, function () {
   console.log("listening on *:" + PORT);
 });
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "/../public", "index.html"));
+});
+app.use(express.static(path.join(__dirname, "/../public")));
 
 // Returns reasonably unique 8 digit id
 const generateRoomId = () => {

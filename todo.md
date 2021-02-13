@@ -2,7 +2,7 @@
 -Use MobX
 -Eject the app so it stands alone as a minimal, webpack-driven project
 -Write some UI unit tests to get familiar
--Make the project available via a subdomain on my personal site
+-(1) Make the project available via a subdomain on my personal site
 -Dynamically input board size and number in a row needed for a win
     -Potential future
 -Write an AI and implement it in a service worker to not block UI (try in main thread first to see how affects behavior)

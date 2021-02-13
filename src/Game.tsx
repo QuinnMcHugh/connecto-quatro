@@ -9,7 +9,7 @@ import { GameMenu } from './GameMenu';
 import { InGameMenu } from './InGameMenu';
 import { InviteModal } from './InviteModal';
 
-const roomId = window.location.pathname.substr(1);
+const roomId = window.location?.search?.substring(1);
 const hasJoinedGame = roomId && roomId.length === 8;
 const initialGameState = hasJoinedGame
   ? new GameModel({ matchType: MatchType.Remote1v1 })

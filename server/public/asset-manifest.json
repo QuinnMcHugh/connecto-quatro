@@ -1,0 +1,23 @@
+{
+  "files": {
+    "main.css": "/static/css/main.9cf84c79.chunk.css",
+    "main.js": "/static/js/main.b2801f81.chunk.js",
+    "main.js.map": "/static/js/main.b2801f81.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.5ceff8c1.js",
+    "runtime-main.js.map": "/static/js/runtime-main.5ceff8c1.js.map",
+    "static/js/2.89612086.chunk.js": "/static/js/2.89612086.chunk.js",
+    "static/js/2.89612086.chunk.js.map": "/static/js/2.89612086.chunk.js.map",
+    "static/js/3.fb351870.chunk.js": "/static/js/3.fb351870.chunk.js",
+    "static/js/3.fb351870.chunk.js.map": "/static/js/3.fb351870.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/main.9cf84c79.chunk.css.map": "/static/css/main.9cf84c79.chunk.css.map",
+    "static/js/2.89612086.chunk.js.LICENSE.txt": "/static/js/2.89612086.chunk.js.LICENSE.txt",
+    "static/media/App.css": "/static/media/FasterOne-Regular.0fc4600c.ttf"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.5ceff8c1.js",
+    "static/js/2.89612086.chunk.js",
+    "static/css/main.9cf84c79.chunk.css",
+    "static/js/main.b2801f81.chunk.js"
+  ]
+}

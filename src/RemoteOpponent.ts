@@ -5,7 +5,7 @@ import { Player } from './Player';
 import { GameModel, Turn, oppositeCellType } from './GameModel';
 import { makeObservable, observable } from 'mobx';
 
-const ENDPOINT = "http://localhost:3000"; // todo: can this be assumed to be the same url+portit was served from
+const ENDPOINT = window.location.origin; // "http://localhost:5000"; todo: can this be assumed to be the same url+portit was served from
 
 const convertObjectToQueryString = (obj: { [key: string]: any }): string => {
   let str = '';
@@ -17,7 +17,7 @@ const convertObjectToQueryString = (obj: { [key: string]: any }): string => {
 };
 
 const createGameLink = (roomId: string): string => {
-  return `${window.location.origin}/${roomId}`;
+  return `${window.location.origin}/?${roomId}`;
 }
 
 export class RemoteOpponent implements Opponent {
@@ -39,7 +39,7 @@ export class RemoteOpponent implements Opponent {
     this._connectionEnded = false;
 
     // Determine handshake query based on the state of the game being joined/created
-    const roomId = window.location.pathname.substr(1);
+    const roomId = window.location?.search?.substring(1);
     const queryParams = roomId && roomId.length
       ? {
         roomId: roomId,
